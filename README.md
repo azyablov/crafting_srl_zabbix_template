@@ -478,7 +478,7 @@ As easy to notice JSONpath of LLD macros are not corresponding to YANG model or 
 
 ![LLDP neighbors preprocessing JS][lldp_nei_preprocessing_js]
 
-In this case code of JavaScript function is provided, while retrieved JSON is provided in ```value``` variable to that function.
+In this case code of JavaScript function supposed to be provided as content of preprocessing step, while retrieved JSON is provided in ```value``` variable to that function.
 
 ![LLDP nei. JS][lldp_nei_js]
 
