@@ -1,4 +1,4 @@
-# How craft Zabbix templates using JSON RPC
+# How to craft Zabbix templates using JSON RPC
 
 Zabbix templates allow to group useful items, triggers and other entities so that those can be reused again and again by applying to hosts in a single step.
 When a template is linked to a host, the host inherits all entities of the template. So, basically a pre-prepared bunch of checks can be applied very quickly.
