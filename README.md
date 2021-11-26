@@ -1,0 +1,1 @@
+# crafting_srl_zabbix_template
