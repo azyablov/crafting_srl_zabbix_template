@@ -8,8 +8,10 @@ This guide is describing how to craft Zabbix templates for SR Linux and overall 
 ## Step-by-step guide
 1. _**Setup**_
 
-First of all you need to create your own playground inluding Zabbix, some SR Linux setup, necessary toolkits and YANG models for your SRL version.
+First of all you need to create your own playground including Zabbix, some SR Linux setup, necessary toolkits and YANG models for your SRL version.
 This samples are built using SR Linux version 21.6.2 and Zabbix 5.4, but it should be relevant for any new version at the extend YANG models for the new SRL version allowing to do so.
+
+> Zabbix template referenced in this guide is [here](srlinux.lldp.yaml)
 
 2. _**The key tools.**_
 
@@ -68,7 +70,7 @@ HTTP/1.1 405 METHOD NOT ALLOWED
 HTTP/1.1 405 METHOD NOT ALLOWED
 ```
 
-4. _**Teamplate creation.**_
+4. _**Template creation.**_
 
 Overall template creation is decribed very well by official Zabbix documentation, so we wil focus on the workflow and nuances related to that. 
 For the newly created template we have to setup a suitable name and assign it to group (should be pre-created, if you would like to use a new one).
@@ -77,7 +79,7 @@ To be able to link teamplate with to parent one we have to some unique name, tha
 
 5. _**Macros.**_
 
-The next step should be qutie common for any template supposed to be created for SR Linux. The idea is simple - you are creating all necessary variables and default values in order to parametrise connectivity params like protocol (HTTP or HTTPS), port, user and password (you could override them in host level, if necessary).
+The next step should be quite common for any template supposed to be created for SR Linux. The idea is simple - you are creating all necessary variables and default values in order to parametrize connectivity params like protocol (HTTP or HTTPS), port, user and password (you could override them in host level, if necessary).
 
 ![Template macro][template_macro]
 
@@ -101,7 +103,7 @@ If you have your yang models under some folder you have to generate list of dire
 ls -R -m | grep \: | sed ':x; /./ {N; s/\n//g; bx}' | sed -e "s/\\:/${1}/g;"
 ```
 Then go to the directory tree root, specify module names required and generate HTML tree.
-In this case all modeules were choosen to generate full tree. Of course, for ```log.sh``` colon is used as parameter as a separator for the list of directories where pyang will try to find modules.
+In this case all modules were chosen to generate full tree. Of course, for ```log.sh``` colon is used as parameter as a separator for the list of directories where pyang will try to find modules.
 ```sh
 [admin@dct0 models]$ SRL_MOD=`find ./ -type f | grep yang | sed ':x; /./ {N; s/\n/ /g; bx}'`
 [admin@dct0 models]$ pyang -p `lod.sh \:` -f jstree -o 21.6.2.tree.html $SRL_MOD
@@ -113,8 +115,8 @@ If you need to monitor specific parameter in the model, then you can create an i
 ![Template items][items_under_template]
 
 In this particular case admin state of LLDP protocol supposed to be monitored.
-More detailed documentatino about JSON RPC methods can be found in [System Management Guide](https://infocenter.nokia.com/public/SRLINUX216R1A/index.jsp?topic=%2Fcom.srlinux.sysmgmt%2Fhtml%2Fjson-interface.html&cp=10_4_4_0&anchor=lindapra5iwesiyjns0). 
-HTTP method is POST and the following JSON is used to retrive LLDP info from state datastore.
+More detailed documentation about JSON RPC methods can be found in [System Management Guide](https://infocenter.nokia.com/public/SRLINUX216R1A/index.jsp?topic=%2Fcom.srlinux.sysmgmt%2Fhtml%2Fjson-interface.html&cp=10_4_4_0&anchor=lindapra5iwesiyjns0). 
+HTTP method is POST and the following JSON is used to retrieve LLDP info from state datastore.
 ```json
 {
   "jsonrpc": "2.0",
@@ -134,7 +136,7 @@ HTTP method is POST and the following JSON is used to retrive LLDP info from sta
 
 8. _**Preprocessing.**_
 
-Item preprocessing need to extact required variables and values from received JSON.
+Item preprocessing need to exact required variables and values from received JSON.
 
 > Important! 
 > In case you are doing JSONpath filtering in preprocessing yu have to add additional tag ```body``` right after ```$```, like ```$.body.result[0].["admin-state"]```, but not like under discovery rules.
@@ -142,15 +144,15 @@ Item preprocessing need to extact required variables and values from received JS
 
 ![Item preprocessing][item_preprocessing_1]
 
-In this particular case we are expracting admin-state value and translating it to numeric repesentation to have nice graph at the end.
+In this particular case we are extracting admin-state value and translating it to numeric representation to have nice graph at the end.
 
-More info about item preprocessing and available functions can be found [here](https://www.zabbix.com/documentation/current/manual/config/items/preprocessing), but we will touch most essenital of them in this document. 
+More info about item preprocessing and available functions can be found [here](https://www.zabbix.com/documentation/current/manual/config/items/preprocessing), but we will touch most essential of them in this document. 
 
 
 9. _**Additional item example**_
 
-To demonstate case more extensively we can consider the following case.
-Let's imagine you want to make sure number of active LLDP interface remains the of has been changed due to some circumstances or just to get infomational triggers about the change.
+To demonstrate case more extensively we can consider the following case.
+Let's imagine you want to make sure number of active LLDP interface remains the of has been changed due to some circumstances or just to get informational triggers about the change.
 
 ![# of LLDP inf][lldp_number_inf]
 
@@ -171,7 +173,7 @@ JSON RPC request is the following:
   }
 }
 ```
-As result you will get something like can be found below, which require addititional processing before something suitable for use can untilised.
+As result you will get something like can be found below, which require additional processing before something suitable for use can unutilized.
 
 ```sh
 (srlJSONAPI-pg) azyablov@mbp srlJSONAPI-pg % curl https://admin:admin@localhost:11001/jsonrpc --insecure -H "Content-Type:application/json" -d @curl/get_system.lldp.json  | python3.7 -m json.tool 
@@ -241,8 +243,8 @@ $.body.result[0].interface.length()
 
 10. _**Triggers**_
 
-Triggers allow to identify amost any kind of problem and deviation.
-Zabbix [official documentation](https://www.zabbix.com/documentation/current/manual/config/triggers/expression) provide good explanation and as well as reach set of various [functions](https://www.zabbix.com/documentation/current/manual/appendix/functions) to manipulate/caclulate/transform/test item values and even historical trands changes.
+Triggers allow to identify almost any kind of problem and deviation.
+Zabbix [official documentation](https://www.zabbix.com/documentation/current/manual/config/triggers/expression) provide good explanation and as well as reach set of various [functions](https://www.zabbix.com/documentation/current/manual/appendix/functions) to manipulate/calculate/transform/test item values and even historical trends changes.
 
 For example, alarm warning severity will be triggered in case LLDP administratively down more than 30 min (in case it deactivated by mistake or incorrectly set by automation).
 
@@ -253,13 +255,13 @@ Recovery expression: ```last(/nokia.netops.srl.lldp/nokia.netops.srl.lldp.admin,
 
 11. _**Discovery rules**_
 
-Coming to more sofisticated topic how to discover and monitor hierarhical structures and lists of dynamic objects/entities. In order to solve it Zabbix is providing [low level discovery rules](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery).
+Coming to more sophisticated topic how to discover and monitor hierarchical structures and lists of dynamic objects/entities. In order to solve it Zabbix is providing [low level discovery rules](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery).
 
 ![Discovery rules][discovery_rules]
 
 
-The idea of dsicovery rules are indended to discover entities provided by NE as a list or array. Then utomatically create items, triggers, and graphs for these entities. In this case you do not need to add manually them and you can start monitoring them automatically.
-More detailed infomation can be found in [officical documentation](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery)
+The idea of discovery rules are indented to discover entities provided by NE as a list or array. Then automatically create items, triggers, and graphs for these entities. In this case you do not need to add manually them and you can start monitoring them automatically.
+More detailed information can be found in [official documentation](https://www.zabbix.com/documentation/current/manual/discovery/low_level_discovery)
 
 As soon items ara dynamic entities you need some way to create unique keys, substitute fields with real values in order to create item, triggers and graphs.
 LLD marcos are used to perform that tasks and very similar to yser marco, but start with ```#``` instead of ```$```.
@@ -268,7 +270,7 @@ In our example we are going to monitor some interface related values, like frame
 
 ![Discovery rules LLDP inf][discovery_rule_lldp_inf]
 
-JSON is quite straghtforward:
+JSON is quite straightforward:
 
 ```json
 {
@@ -286,7 +288,7 @@ JSON is quite straghtforward:
   }
 }
 ```
-In preprocessing secion in one step to extract list of intefaces using ```JSONpath```:
+In preprocessing section in one step to extract list of interfaces using ```JSONpath```:
 
 ```go
 $.result[0].interface
@@ -305,8 +307,8 @@ As per [official Zabbix documentation](https://www.zabbix.com/documentation/curr
 
 12. _**Item prototypes**_
 
-As soon as discovery rules are defined and necessary macro developed, we can proceed with creation of items, triggers, etc... Let's take relatively simple case, where ```frame-rate-in/out``` rate of LLDP interface is monitored in order to detect abonormal behavior.
-JSON RPC request is defined with marco ```{#NAME}``` to catch up necesary interface, as well as the item key ```nokia.netops.srl.lldp.interfaces.statistics.frame-rate-in.[{#NAME}]```
+As soon as discovery rules are defined and necessary macro developed, we can proceed with creation of items, triggers, etc... Let's take relatively simple case, where ```frame-rate-in/out``` rate of LLDP interface is monitored in order to detect abnormal behavior.
+JSON RPC request is defined with marco ```{#NAME}``` to catch up necessary interface, as well as the item key ```nokia.netops.srl.lldp.interfaces.statistics.frame-rate-in.[{#NAME}]```
 
 ```json
 {
@@ -334,8 +336,8 @@ Preprocessing section has two steps:
 
 ## Advanced preprocessing of hieranhical and dynamic JSON entities 
 
-This secition describes advanced preprocessing of retrieved JSON data with hierahical and dynamic entities. For the sake of example LLDP interface neighbors will be considered. We will discover all LLDP neighbours per interfaces and track uptime.
-In conternaer lab environment we have single bridge where all mgmt interfaces of SRL containers attached, which makes our excercise even more interesting and prepresentative. By retrieving JSON by using the following RPC request built in accordance with LLDP YANG model
+This section describes advanced preprocessing of retrieved JSON data with hierarchical and dynamic entities. For the sake of example LLDP interface neighbors will be considered. We will discover all LLDP neighbors per interfaces and track uptime.
+In containerlab environment we have single bridge where all mgmt interfaces of SRL containers attached, which makes our exercise even more interesting and representative. By retrieving JSON by using the following RPC request built in accordance with LLDP YANG model
 ```json
 {
   "jsonrpc": "2.0",
@@ -471,10 +473,10 @@ The key and name built using LLD macro:
 
 Filters are configured as per interest to check only mgmt and ethernet interfaces:
 
-![LLDP neighbiors filter][lldp_nei_filter]
+![LLDP neighbors filter][lldp_nei_filter]
 
 
-As easy to notice JSONpath of LLD macros are not corresponding to YANG model or JSON structure, because additional prepocessing were applied to flattern received JSON data, otherwise it's not possible to create items for nested dynamic entities, just because Zabbix expect list or array of items and additional preprocessing supposed to be done before JSON data can be used for LLD macro value assignment. This task can be performed via JavaScript preprocessing. 
+As easy to notice JSONpath of LLD macros are not corresponding to YANG model or JSON structure, because additional preprocessing were applied to flatten received JSON data, otherwise it's not possible to create items for nested dynamic entities, just because Zabbix expect list or array of items and additional preprocessing supposed to be done before JSON data can be used for LLD macro value assignment. This task can be performed via JavaScript preprocessing. 
 
 ![LLDP neighbors preprocessing JS][lldp_nei_preprocessing_js]
 
@@ -483,7 +485,7 @@ In this case code of JavaScript function supposed to be provided as content of p
 ![LLDP nei. JS][lldp_nei_js]
 
 ```javascript
-    // create an empty array to flattern info about LLDP neighbors
+    // create an empty array to flatten info about LLDP neighbors
     var lldpNeighbors = []; 
 
     var receivedJSON= JSON.parse(value);
@@ -513,7 +515,7 @@ In this case code of JavaScript function supposed to be provided as content of p
 ```
 
 As result script return simple JSON that can be used to retrieve values for LLD macro.
-In the next turn item protoypes can be created. In our case we retrieve LLDP neigbor state and calculate uptime.
+In the next turn item prototypes can be created. In our case we retrieve LLDP neighbor state and calculate uptime.
 The item key is and JSON RPC are using LLD macro from previous step:
 
 ```nokia.netops.srl.lldp.neighbors.uptime.[{#INFNAME},{#NEIGHBORSYSTEMNAME}]``` 
@@ -535,7 +537,7 @@ The item key is and JSON RPC are using LLD macro from previous step:
 }
 ```
 
-But here we are not receiving just an uptime value, but time when first LLDP mesage was received and the last one from neighbor:
+But here we are not receiving just an uptime value, but time when first LLDP message was received and the last one from neighbor:
 
 ```json
     "first-message": "2021-10-27T13:16:53.466Z",
@@ -558,11 +560,11 @@ var receivedJSON= JSON.parse(value);
                 
     return JSON.stringify(uptime);
 ```
-Finally, in the latest data various template discovery items will appear aftera a few minutes:
+Finally, in the latest data various template discovery items will appear after a few minutes:
 
 ![latest data][latest_data]
 
-[new_template]: pic/new_template.png "New teamplate"
+[new_template]: pic/new_template.png "New template"
 [template_macro]: pic/template_macro.png "Template macro"
 [yang_tree]: pic/yang_tree.png "Yang tree"
 [items_under_template]: pic/items_under_template.png "Template items"
@@ -578,7 +580,7 @@ Finally, in the latest data various template discovery items will appear aftera 
 [trigger]: pic/trigger.png "Trigger"
 [lldp_neighbors]: pic/lldp_neighbors.png "LLDP neighbors"
 [lldp_nei_lld_marco]: pic/lldp_nei_lld_marco.png "LLDP neighbors LLD macro"
-[lldp_nei_filter]: pic/lldp_nei_filter.png "LLDP neighbiors filter"
+[lldp_nei_filter]: pic/lldp_nei_filter.png "LLDP neighbors filter"
 [lldp_nei_preprocessing_js]: pic/lldp_nei_preprocessing_js.png "LLDP neighbors preprocessing JS"
 [lldp_nei_js]: pic/lldp_nei_js.png "LLDP neighbors JS"
 [latest_data]: pic/latest_data.png "Latest data"
