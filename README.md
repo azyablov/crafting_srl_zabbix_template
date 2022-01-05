@@ -13,7 +13,7 @@ This samples are built using SR Linux version 21.6.2 and Zabbix 5.4, but it shou
 
 > Zabbix template referenced in this guide is [here](srlinux.lldp.yaml)
 
-2. _**The key tools.**_
+2. _**The key tools**_
 
 Number of tools can be used, but for this particular case we are using [containerlab](https://containerlab.srlinux.dev/) and [gnmic](https://gnmic.kmrd.dev). Of course, should have your Zabbix up and running and connectivity available between Zabbix containers/VM and mgmt interface of your SRL boxes.
 ```sh
@@ -32,7 +32,7 @@ INFO[0000] Parsing & checking topology file: 6npg.yml
 | 8 | clab-6npg-srl6 | 03fcdef6b616 | srlinux                         | srl   | running | 172.20.20.4/24 | 2001:172:20:20::4/64 |
 +---+----------------+--------------+---------------------------------+-------+---------+----------------+----------------------+
 ```
-3. _**Connectivity verification.**_
+3. _**Connectivity verification**_
 
 From Zabbix you can verify everything is ok by running trivial check using ```curl```. So if you see HTTP error 405 it means you are goog to go with template development.
 
@@ -70,14 +70,14 @@ HTTP/1.1 405 METHOD NOT ALLOWED
 HTTP/1.1 405 METHOD NOT ALLOWED
 ```
 
-4. _**Template creation.**_
+4. _**Template creation**_
 
 Overall template creation is decribed very well by official Zabbix documentation, so we wil focus on the workflow and nuances related to that. 
 For the newly created template we have to setup a suitable name and assign it to group (should be pre-created, if you would like to use a new one).
 To be able to link teamplate with to parent one we have to some unique name, that's why ```nokia.netops.srl.lldp``` is used to reflect yang model covered by particular template.
 ![New teamplate][new_template]
 
-5. _**Macros.**_
+5. _**Macros**_
 
 The next step should be quite common for any template supposed to be created for SR Linux. The idea is simple - you are creating all necessary variables and default values in order to parametrize connectivity params like protocol (HTTP or HTTPS), port, user and password (you could override them in host level, if necessary).
 
@@ -91,7 +91,25 @@ Marcos actively used for URL specification of HTTP items, since it should purely
 {$PROTO}://{HOST.CONN}:{$JSONPORT}/jsonrpc
 ```
 
-6. _**YANG models.**_
+6. _**YANG models**_
+
+First of all, SRL YANG models are stored and maintained in[nokia/srlinux-yang-models](https://github.com/nokia/srlinux-yang-models)
+
+  * _***Online way***_ 
+
+Normally, you want to be efficient and save a time, so the best way is to use online [YANG browser](https://yang.srlinux.dev/). More information can be found on [srlinux.dev](https://learn.srlinux.dev/yang/browser/). 
+
+Online tool provides you with convenient path browser
+
+![Path browser][online_yang_path_browser]
+
+and nice tree one, so it's pleasure to work with such tool.
+
+![Tree browser][tree_browser]
+
+  * _***Offine way***_
+
+If you prefer a hard way, the here it is )). 
 
 For the sake of example we will use LLDP data model. So, [pyang](https://github.com/mbj4668/pyang) can be used to generate nice view and improve your navigation experience.
 ![Yang tree][yang_tree]
@@ -584,3 +602,5 @@ Finally, in the latest data various template discovery items will appear after a
 [lldp_nei_preprocessing_js]: pic/lldp_nei_preprocessing_js.png "LLDP neighbors preprocessing JS"
 [lldp_nei_js]: pic/lldp_nei_js.png "LLDP neighbors JS"
 [latest_data]: pic/latest_data.png "Latest data"
+[online_yang_path_browser]: pic/online_yang_path_browser.png "Path browser"
+[tree_browser]: pic/tree_browser.png "Tree browser"
