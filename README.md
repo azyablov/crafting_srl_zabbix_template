@@ -93,7 +93,7 @@ Marcos actively used for URL specification of HTTP items, since it should purely
 
 6. _**YANG models**_
 
-First of all, SRL YANG models are stored and maintained in[nokia/srlinux-yang-models](https://github.com/nokia/srlinux-yang-models)
+First of all, SRL YANG models are stored and maintained in [nokia/srlinux-yang-models](https://github.com/nokia/srlinux-yang-models)
 
   * _***Online way***_ 
 
@@ -127,7 +127,7 @@ In this case all modules were chosen to generate full tree. Of course, for ```lo
 [admin@dct0 models]$ pyang -p `lod.sh \:` -f jstree -o 21.6.2.tree.html $SRL_MOD
 ```
 
-7. _**Items.**_
+7. _**Items**_
 
 If you need to monitor specific parameter in the model, then you can create an item directly under template w/o specifying discovery rules. As soon as we are using JSON RPC, HTTP item type gonna be extensively used together with JSONpath preprocessing
 ![Template items][items_under_template]
@@ -152,7 +152,7 @@ HTTP method is POST and the following JSON is used to retrieve LLDP info from st
 }
 ```
 
-8. _**Preprocessing.**_
+8. _**Preprocessing**_
 
 Item preprocessing need to exact required variables and values from received JSON.
 
@@ -352,7 +352,7 @@ Preprocessing section has two steps:
 
 ![item prototype preprocessing][item_proto_preprocessing]
 
-## Advanced preprocessing of hieranhical and dynamic JSON entities 
+## Advanced preprocessing of hierarchical and dynamic JSON entities 
 
 This section describes advanced preprocessing of retrieved JSON data with hierarchical and dynamic entities. For the sake of example LLDP interface neighbors will be considered. We will discover all LLDP neighbors per interfaces and track uptime.
 In containerlab environment we have single bridge where all mgmt interfaces of SRL containers attached, which makes our exercise even more interesting and representative. By retrieving JSON by using the following RPC request built in accordance with LLDP YANG model
